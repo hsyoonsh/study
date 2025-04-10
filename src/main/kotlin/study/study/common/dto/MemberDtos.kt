@@ -1,14 +1,15 @@
 package study.study.common.dto
 
-import study.study.common.status.Gender
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
 import study.study.common.annotation.ValidEnum
+import study.study.common.status.Dormitory
 import study.study.member.entity.Member
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
 
 data class MemberDtoRequest(
     val id: Long?,
@@ -30,39 +31,48 @@ data class MemberDtoRequest(
     private val _name: String?,
 
     @field:NotBlank
-    @field:Pattern(
-        regexp = "^([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))$",
-        message = "날짜형식(YYYY-MM-DD)을 확인해주세요"
-    )
-    @JsonProperty("birthDate")
-    private val _birthDate: String?,
-
-    @field:NotBlank
-    @field:ValidEnum(enumClass= Gender::class, message = "MAN 이나 WOMAN 중 하나를 선택해주세요.")
-    @JsonProperty("gender")
-    private val _gender: String?,
-
-    @field:NotBlank
     @field:Email
     @JsonProperty("email")
     private val _email: String?,
-) {
+
+    @field:NotBlank
+    @field:ValidEnum(enumClass = Dormitory::class, message = "올바른 기숙사 타입을 선택해주세요.")
+    @JsonProperty("dormitory")
+    private val _dormitory: String?,
+    ) {
     val loginId: String
         get() = _loginId!!
+
     val password: String
         get() = _password!!
+
     val name: String
         get() = _name!!
-    val birthDate: LocalDate
-        get() = _birthDate!!.toLocalDate()
-    val gender: Gender
-        get() = Gender.valueOf(_gender!!)
+
     val email: String
          get() = _email!!
+
+    val dormitory: Dormitory
+        get() = Dormitory.valueOf(_dormitory!!)
 
     private fun String.toLocalDate(): LocalDate =
         LocalDate.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
     fun toEntity(): Member =
-        Member(id, loginId, password, name, birthDate, gender, email)
+        Member(id, loginId, password, name, email, dormitory)
+}
+
+data class LoginDto(
+    @field:NotBlank
+    @JsonProperty("loginId")
+    private val _loginId: String?,
+
+    @field:NotBlank
+    @JsonProperty("password")
+    private val _password: String?,
+) {
+    val loginId: String
+        get() = _loginId!!
+    val password: String
+        get() = _password!!
 }
